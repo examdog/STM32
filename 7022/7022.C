@@ -15,12 +15,12 @@ double temp=0,Pfa,Pfb,Pfc;
 void Correction7022()
 {
 while(Read7022(0)!=0x7122A0);
-Proofread_EN();
+  Proofread_EN();
   write7022(w_ModeCfg+0x80,0xb9Ff);//模式配置  
   write7022(w_EMUCfg+0x80,0xf884);
   write7022(w_ModuleCFG+0x80,0x3427);//模拟模块使能 
   write7022(w_Hfconst+0x80,0x7); 
-	
+  write7022(w_PGACtrl,0);
   write7022(w_UgainA+0x80,verify_parameter[0]);
   write7022(w_UgainB+0x80,verify_parameter[1]);
   write7022(w_UgainC+0x80,verify_parameter[2]);
@@ -43,27 +43,6 @@ Proofread_EN();
   write7022(w_PhSregCpq1+0x80,verify_parameter[11]);//65088
   write7022(w_PhSregCpq0+0x80,verify_parameter[11]); //65088
   write7022(w_QPhscal+0x80,0x0);
-  /*
-  write7022(w_PGACtrl,);
-     
-  write7022(w_PoffsetA,);
-  write7022(w_PoffsetB,);
-  write7022(w_PoffsetC,);
-  
-  write7022(w_QoffsetA,);
-  write7022(w_QoffsetB,);
-  write7022(w_QoffsetC,);
-  
-  write7022(w_UaRmsoffse);
-  write7022(w_UbRmsoffse);
-  write7022(w_UcRmsoffse);
-  
-  write7022(w_IaRmsoffse);
-  write7022(w_IbRmsoffse);
-  write7022(w_IcRmsoffse);
-  
-  write7022(w_Pstart); 
-  */
   Proofread_DIS();
 }
 
@@ -253,10 +232,28 @@ void Read_reg(void)
 //           10   无功负
 int Detection_of_phase_squence(void)
 {
-	int temp=0;
-	temp=(Read7022(r_SFlag)&0xFF)<<4|(Read7022(r_PFlag)&0x07);//标志状态
-	return temp;
+
+	return(Read7022(r_SFlag)&0x7F);//标志状态
 }
+/*
+Bit00
+PA =1，表示A相失压；=0，A相未失压。
+Bit01
+PB =1，表示B相失压；=0，B相未失压。
+Bit02
+PC =1，表示C相失压；=0，C相未失压。
+Bit03
+Uorder =1，表示电压相序错；=0，电压未错相序。
+Bit04
+Iorder =1，表示电流相序错；=0，电流未错相序。
+*/
+int Default_phase(void)
+{
+	return(Read7022(r_SFlag)&0x1F);//标志状态
+}
+
+	
+	
 	
 	
 	
